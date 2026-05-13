@@ -1,17 +1,27 @@
 {
-  "name": "musicbuddybackend",
+  "name": "musicbuddy-backend",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "index.js",
+  "description": "MusicBuddy Backend - Node.js + Express + SQLite",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
+  "keywords": [
+    "music",
+    "app",
+    "backend",
+    "express",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
-  },
-  "devDependencies": {}
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3"
+  }
 }
