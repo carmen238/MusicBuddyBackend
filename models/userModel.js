@@ -51,25 +51,26 @@ async function findUserById(id) {
 }
 
 /**
- * Update user profile
+ * Update user profile field
  */
-async function updateUser(id, updates) {
+async function updateFieldUser(id, keyField, valueField) {
   try {
-    const fields = [];
-    const values = [];
-
-    for (const [key, value] of Object.entries(updates)) {
-      fields.push(`${key} = ?`);
-      values.push(value);
+    // Check if user exists
+    const user = await findUserById(id);
+    if (!user) {
+      console.log(`❌ User not found: ID ${id}`);
+      return false;
     }
 
-    values.push(id);
+    // Build SQL query
+    const sql = `UPDATE users SET ${keyField} = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+    const values = [valueField, id];
 
-    const sql = `UPDATE users SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
-    
+    // Execute update
     await dbAsync.run(sql, values);
-    console.log(`✅ User updated: ID ${id}`);
+    console.log(`✅ User updated: ID ${id}, ${keyField} = ${valueField}`);
     return true;
+
   } catch (err) {
     console.error('❌ Error updating user:', err.message);
     throw err;
@@ -85,10 +86,10 @@ async function deleteUser(id) {
       `DELETE FROM users WHERE id = ?`,
       [id]
     );
-    console.log(`✅ User deleted: ID ${id}`);
+    console.log(`User deleted: ID ${id}`);
     return true;
   } catch (err) {
-    console.error('❌ Error deleting user:', err.message);
+    console.error('Error deleting user:', err.message);
     throw err;
   }
 }
@@ -97,6 +98,6 @@ module.exports = {
   createUser,
   findUserByEmail,
   findUserById,
-  updateUser,
+  updateFieldUser,
   deleteUser
 };

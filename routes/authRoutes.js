@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { createUser, findUserByEmail } = require('../models/userModel');
+const { createUser, findUserByEmail, updateFieldUser } = require('../models/userModel');
 
 const router = express.Router();
 
@@ -113,5 +113,46 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Login failed' });
   }
 });
+
+/**
+ * POST /api/auth/updatFieldUser
+ * Update field the field of the user
+ */
+router.post('/updateFieldUser', async (req, res) => {
+  try {
+    const { idUser, keyField, valueField } = req.body;
+
+    // Validate required fields
+    if (!idUser || !keyField || !valueField) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: idUser, keyField, valueField' 
+      });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (keyField === 'email' && !emailRegex.test(valueField)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Call the update function
+    const success = await updateFieldUser(idUser, keyField, valueField);
+
+    if (!success) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log(`Field updated: ${keyField} for user ${idUser}`);
+    res.status(200).json({ 
+      message: 'Field updated successfully',
+      userId: idUser
+    });
+
+  } catch (err) {
+    console.error('Field update error:', err.message);
+    res.status(500).json({ error: 'Field update failed' });
+  }
+});
+
 
 module.exports = router;

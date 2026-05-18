@@ -31,4 +31,5 @@ app.listen(PORT, () => {
   console.log(`📍 Server URL: http://localhost:${PORT}`);
   console.log(`🔗 Register endpoint: POST http://localhost:${PORT}/api/auth/register`);
   console.log(`🔗 Login endpoint: POST http://localhost:${PORT}/api/auth/login`);
+  console.log(`🔗 Update Field endpoint: POST http://localhost:${PORT}/api/auth/updateFieldUser`);
 });
