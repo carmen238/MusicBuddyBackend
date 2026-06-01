@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const {
   createUser,
   findUserByEmail,
-  updateFieldUser
+  findUserById,
+  updateUser
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -20,14 +21,29 @@ router.post('/register', async (req, res) => {
       name,
       surname,
       phone,
-      instrument,
-      genres,
-      experienceLevel,
-      isInBand
+      instrument = "",
+      experienceLevel = "",
+      genre = "",
+      isInBand = false
     } = req.body;
 
+    // Validate required fields
+    if (!email || !password || !name || !surname) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: email, password, name, surname' 
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await findUserByEmail(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already registered' });
+    }
+
+    // Hash password
     const hashed = await bcrypt.hash(password, 10);
 
+    // Create user
     const userId = await createUser(
       email,
       hashed,
@@ -35,17 +51,20 @@ router.post('/register', async (req, res) => {
       surname,
       phone,
       instrument,
-      genres,
       experienceLevel,
+      genre,
       isInBand
     );
 
+    console.log(`✅ User registered: ${email} (ID: ${userId})`);
+
     res.status(201).json({
-      message: 'User created',
+      message: 'User created successfully',
       userId
     });
 
   } catch (err) {
+    console.error('❌ Registration error:', err.message);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
@@ -57,24 +76,56 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: email, password' 
+      });
+    }
+
+    // Find user
     const user = await findUserByEmail(email);
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
+    // Compare password
     const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!ok) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
+    // Generate JWT token
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '24h' }
     );
 
+    // Return user without password
+    const userWithoutPassword = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      surname: user.surname,
+      phone: user.phone || null,
+      bio: user.bio || null,
+      instrument: user.instrument || null,
+      experienceLevel: user.experienceLevel || null,
+      genre: user.genre || null,
+      isInBand: user.isInBand || false
+    };
+
+    console.log(`✅ User logged in: ${email}`);
+
     res.json({
+      message: 'Login successful',
       token,
-      user
+      user: userWithoutPassword
     });
 
   } catch (err) {
+    console.error('❌ Login error:', err.message);
     res.status(500).json({ error: 'Login failed' });
   }
 });
@@ -86,16 +137,36 @@ router.post('/updateFieldUser', async (req, res) => {
   try {
     const { idUser, keyField, valueField } = req.body;
 
-    const ok = await updateFieldUser(idUser, keyField, valueField);
-
-    if (!ok) {
-      return res.status(400).json({ error: 'Update failed' });
+    // Validate required fields
+    if (!idUser || !keyField || !valueField) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: idUser, keyField, valueField' 
+      });
     }
 
-    res.json({ message: 'Updated' });
+    // Validate email format if updating email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (keyField === 'email' && !emailRegex.test(valueField)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Update user field
+    const success = await updateUser(idUser, keyField, valueField);
+
+    if (!success) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log(`✅ User field updated: ID ${idUser}, ${keyField} = ${valueField}`);
+
+    res.json({ 
+      message: 'Field updated successfully',
+      userId: idUser
+    });
 
   } catch (err) {
-    res.status(500).json({ error: 'Update error' });
+    console.error('❌ Update error:', err.message);
+    res.status(500).json({ error: 'Update failed ' });
   }
 });
 

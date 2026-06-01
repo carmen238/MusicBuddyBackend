@@ -21,20 +21,22 @@ function initializeDatabase() {
       name TEXT NOT NULL,
       surname TEXT NOT NULL,
       phone TEXT,
-      bio TEXT,
-
-      instrument TEXT,
-      genres TEXT,
-      experienceLevel TEXT,
-
+      bio TEXT DEFAULT '',
+      instrument TEXT DEFAULT '',
+      experienceLevel TEXT DEFAULT '',
+      genre TEXT DEFAULT '',
       isInBand INTEGER DEFAULT 0,
-
       rating INTEGER DEFAULT 0,
-
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
+    )
+  `, (err) => {
+    if (err) {
+      console.error('❌ Error creating users table:', err.message);
+    } else {
+      console.log('✅ Users table initialized');
+    }
+  });
 }
 
 const dbAsync = {

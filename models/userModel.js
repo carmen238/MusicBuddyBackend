@@ -9,115 +9,154 @@ async function createUser(
   name,
   surname,
   phone,
-  instrument,
-  genres,
-  experienceLevel,
-  isInBand
+  instrument = "",
+  experienceLevel = "",
+  genre = "",
+  isInBand = false
 ) {
-  const result = await dbAsync.run(
-    `INSERT INTO users 
-    (email, password, name, surname, phone, instrument, genres, experienceLevel, isInBand)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      email,
-      hashedPassword,
-      name,
-      surname,
-      phone,
-      JSON.stringify(instrument || []),
-      JSON.stringify(genres || []),
-      experienceLevel,
-      isInBand ? 1 : 0
-    ]
-  );
+  try {
+    const result = await dbAsync.run(
+      `INSERT INTO users 
+      (email, password, name, surname, phone, instrument, experienceLevel, genre, isInBand)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        email,
+        hashedPassword,
+        name,
+        surname,
+        phone,
+        instrument,
+        experienceLevel,
+        genre,
+        isInBand ? 1 : 0
+      ]
+    );
 
-  return result.id;
+    console.log(`✅ User created: ${email} (ID: ${result.id})`);
+    return result.id;
+
+  } catch (err) {
+    console.error('❌ Error creating user:', err.message);
+    throw err;
+  }
 }
 
 /**
  * FIND BY EMAIL
  */
 async function findUserByEmail(email) {
-  const user = await dbAsync.get(
-    `SELECT * FROM users WHERE email = ?`,
-    [email]
-  );
+  try {
+    const user = await dbAsync.get(
+      `SELECT * FROM users WHERE email = ?`,
+      [email]
+    );
 
-  if (user) {
-    user.instrument = JSON.parse(user.instrument || "[]");
-    user.genres = JSON.parse(user.genres || "[]");
-    user.isInBand = user.isInBand === 1;
+    if (user) {
+      user.isInBand = user.isInBand === 1;
+    }
+
+    return user;
+
+  } catch (err) {
+    console.error('❌ Error finding user by email:', err.message);
+    throw err;
   }
-
-  return user;
 }
 
 /**
  * FIND BY ID
  */
 async function findUserById(id) {
-  const user = await dbAsync.get(
-    `SELECT * FROM users WHERE id = ?`,
-    [id]
-  );
+  try {
+    const user = await dbAsync.get(
+      `SELECT id, email, name, surname, phone, bio, instrument, experienceLevel, genre, isInBand, rating, created_at FROM users WHERE id = ?`,
+      [id]
+    );
 
-  if (user) {
-    user.instrument = JSON.parse(user.instrument || "[]");
-    user.genres = JSON.parse(user.genres || "[]");
-    user.isInBand = user.isInBand === 1;
+    if (user) {
+      user.isInBand = user.isInBand === 1;
+    }
+
+    return user;
+
+  } catch (err) {
+    console.error('❌ Error finding user by ID:', err.message);
+    throw err;
   }
-
-  return user;
 }
 
 /**
- * UPDATE FIELD (SAFE)
+ * UPDATE USER FIELD
  */
-async function updateFieldUser(id, keyField, valueField) {
-  const allowed = [
-    'email',
-    'name',
-    'surname',
-    'phone',
-    'bio',
-    'instrument',
-    'genres',
-    'experienceLevel',
-    'isInBand'
-  ];
+async function updateUser(idUser, keyField, valueField) {
+  try {
+    // Campi consentiti
+    const allowed = [
+      'email',
+      'name',
+      'surname',
+      'phone',
+      'bio',
+      'instrument',
+      'experienceLevel',
+      'genre',
+      'isInBand'
+    ];
 
-  if (!allowed.includes(keyField)) return false;
+    if (!allowed.includes(keyField)) {
+      console.log(`❌ Field not allowed: ${keyField}`);
+      return false;
+    }
 
-  const user = await findUserById(id);
-  if (!user) return false;
+    // Verifica che l'utente esista
+    const user = await findUserById(idUser);
+    if (!user) {
+      console.log(`❌ User not found: ${idUser}`);
+      return false;
+    }
 
-  const value =
-    Array.isArray(valueField)
-      ? JSON.stringify(valueField)
-      : keyField === 'isInBand'
-      ? valueField ? 1 : 0
-      : valueField;
+    // Converti il valore se necessario
+    let value = valueField;
+    if (keyField === 'isInBand') {
+      value = valueField === 'true' || valueField === true ? 1 : 0;
+    }
 
-  await dbAsync.run(
-    `UPDATE users SET ${keyField} = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [value, id]
-  );
+    console.log(`📝 Updating user ${idUser}: ${keyField} = ${value}`);
 
-  return true;
+    // Esegui l'update
+    await dbAsync.run(
+      `UPDATE users SET ${keyField} = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+      [value, idUser]  // ✅ CORRETTO: idUser al posto di id
+    );
+
+    console.log(`✅ User field updated: ${keyField}`);
+    return true;
+
+  } catch (err) {
+    console.error(`❌ Error updating user field: ${err.message}`);
+    return false;
+  }
 }
 
 /**
  * DELETE USER
  */
 async function deleteUser(id) {
-  await dbAsync.run(`DELETE FROM users WHERE id = ?`, [id]);
-  return true;
+  try {
+    await dbAsync.run(`DELETE FROM users WHERE id = ?`, [id]);
+    console.log(`✅ User deleted: ${id}`);
+    return true;
+
+  } catch (err) {
+    console.error('❌ Error deleting user:', err.message);
+    throw err;
+  }
 }
 
 module.exports = {
   createUser,
   findUserByEmail,
   findUserById,
-  updateFieldUser,
+  updateUser,
   deleteUser
 };
