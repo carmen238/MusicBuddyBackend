@@ -1,10 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Database path
 const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'musicbuddy.db');
 
-// Create database connection
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('❌ Error opening database:', err.message);
@@ -14,7 +12,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-// Initialize database - create tables if they don't exist
 function initializeDatabase() {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -24,57 +21,46 @@ function initializeDatabase() {
       name TEXT NOT NULL,
       surname TEXT NOT NULL,
       phone TEXT,
-      bio TEXT DEFAULT '',
+      bio TEXT,
+
+      instrument TEXT,
+      genres TEXT,
+      experienceLevel TEXT,
+
+      isInBand INTEGER DEFAULT 0,
+
       rating INTEGER DEFAULT 0,
+
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `, (err) => {
-    if (err) {
-      console.error('❌ Error creating users table:', err.message);
-    } else {
-      console.log('✅ Users table initialized');
-    }
-  });
+    );
+  `);
 }
 
-// Promisify database methods
 const dbAsync = {
-  run: (sql, params = []) => {
-    return new Promise((resolve, reject) => {
-      db.run(sql, params, function(err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: this.lastID, changes: this.changes });
-        }
+  run: (sql, params = []) =>
+    new Promise((resolve, reject) => {
+      db.run(sql, params, function (err) {
+        if (err) reject(err);
+        else resolve({ id: this.lastID, changes: this.changes });
       });
-    });
-  },
+    }),
 
-  get: (sql, params = []) => {
-    return new Promise((resolve, reject) => {
+  get: (sql, params = []) =>
+    new Promise((resolve, reject) => {
       db.get(sql, params, (err, row) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(row);
-        }
+        if (err) reject(err);
+        else resolve(row);
       });
-    });
-  },
+    }),
 
-  all: (sql, params = []) => {
-    return new Promise((resolve, reject) => {
+  all: (sql, params = []) =>
+    new Promise((resolve, reject) => {
       db.all(sql, params, (err, rows) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(rows);
-        }
+        if (err) reject(err);
+        else resolve(rows);
       });
-    });
-  }
+    })
 };
 
 module.exports = dbAsync;
