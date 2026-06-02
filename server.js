@@ -19,6 +19,8 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 
+
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running' });
@@ -29,6 +31,14 @@ app.use((err, req, res, next) => {
 console.error('Error:', err.message);
   res.status(500).json({ error: 'Internal server error' });
 });
+
+const photoRoutes = require('./routes/photoRoutes');
+
+// Add this line after other route definitions
+app.use('/api/users', photoRoutes);
+
+// Serve uploaded files as static
+app.use('/uploads', express.static('uploads'))
 
 // Start server
 app.listen(PORT, () => {

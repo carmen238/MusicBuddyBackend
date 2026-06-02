@@ -92,16 +92,17 @@ async function updateUser(idUser, keyField, valueField) {
   try {
     // Campi consentiti
     const allowed = [
-      'email',
-      'name',
-      'surname',
-      'phone',
-      'bio',
-      'instrument',
-      'experienceLevel',
-      'genre',
-      'isInBand'
-    ];
+  'email',
+  'name',
+  'surname',
+  'phone',
+  'bio',
+  'instrument',
+  'genres',
+  'experienceLevel',
+  'isInBand',
+  'photo_url' // 👈 AGGIUNGI QUESTO
+];
 
     if (!allowed.includes(keyField)) {
       console.log(`❌ Field not allowed: ${keyField}`);
