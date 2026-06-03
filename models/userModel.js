@@ -12,13 +12,14 @@ async function createUser(
   instrument = "",
   experienceLevel = "",
   genre = "",
-  isInBand = false
+  isInBand = false,
+  photo_url = ""
 ) {
   try {
     const result = await dbAsync.run(
       `INSERT INTO users 
-      (email, password, name, surname, phone, instrument, experienceLevel, genre, isInBand)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (email, password, name, surname, phone, instrument, experienceLevel, genre, isInBand, photo_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         email,
         hashedPassword,
@@ -28,7 +29,8 @@ async function createUser(
         instrument,
         experienceLevel,
         genre,
-        isInBand ? 1 : 0
+        isInBand ? 1 : 0,
+        photo_url
       ]
     );
 
@@ -101,7 +103,7 @@ async function updateUser(idUser, keyField, valueField) {
   'genres',
   'experienceLevel',
   'isInBand',
-  'photo_url' // 👈 AGGIUNGI QUESTO
+  'photo_url' 
 ];
 
     if (!allowed.includes(keyField)) {

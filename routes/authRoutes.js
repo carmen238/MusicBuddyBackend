@@ -53,7 +53,8 @@ router.post('/register', async (req, res) => {
       instrument,
       experienceLevel,
       genre,
-      isInBand
+      isInBand,
+      photo_url
     );
 
     console.log(`✅ User registered: ${email} (ID: ${userId})`);
@@ -113,7 +114,8 @@ router.post('/login', async (req, res) => {
       instrument: user.instrument || null,
       experienceLevel: user.experienceLevel || null,
       genre: user.genre || null,
-      isInBand: user.isInBand || false
+      isInBand: user.isInBand || false,
+      photo_url: user.photo_url || null,
     };
 
     console.log(`✅ User logged in: ${email}`);
