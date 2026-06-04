@@ -9,6 +9,7 @@ async function createUser(
   name,
   surname,
   phone,
+  bio = "",
   instrument = "",
   experienceLevel = "",
   genre = "",
@@ -18,7 +19,7 @@ async function createUser(
   try {
     const result = await dbAsync.run(
       `INSERT INTO users 
-      (email, password, name, surname, phone, instrument, experienceLevel, genre, isInBand, photo_url)
+      (email, password, name, surname, phone, bio, instrument, experienceLevel, genre, isInBand, photo_url)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         email,
@@ -26,6 +27,7 @@ async function createUser(
         name,
         surname,
         phone,
+        bio,
         instrument,
         experienceLevel,
         genre,
@@ -156,10 +158,19 @@ async function deleteUser(id) {
   }
 }
 
+/**
+ * GET ALL USERS INFOS
+ */
+async function getAllUsersInfos() {
+    const query = 'SELECT id, instrument, experienceLevel, genre, isInBand, rating FROM users';
+    return await dbAsync.all(query);
+}
+
 module.exports = {
   createUser,
   findUserByEmail,
   findUserById,
   updateUser,
-  deleteUser
+  deleteUser,
+  getAllUsersInfos
 };

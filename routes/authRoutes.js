@@ -5,7 +5,8 @@ const {
   createUser,
   findUserByEmail,
   findUserById,
-  updateUser
+  updateUser,
+  getAllUsersInfos
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -169,6 +170,30 @@ router.post('/updateFieldUser', async (req, res) => {
   } catch (err) {
     console.error('❌ Update error:', err.message);
     res.status(500).json({ error: 'Update failed ' });
+  }
+});
+
+/**
+ * GET ALL USERS INFOS
+ */
+router.get("/getAllUsersInfos", async (req, res) => {
+  try {
+    const usersInfos = await getAllUsersInfos();
+        
+    res.status(200).json({
+        success: true,
+        data: usersInfos
+    });
+
+    console.log(`✅ Users infos retrieved`);
+
+  } catch (err) {
+    console.error('❌ Error fetching users:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve users.'
+    });
   }
 });
 
