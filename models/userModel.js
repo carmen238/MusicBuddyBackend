@@ -9,11 +9,11 @@ async function createUser(
   name,
   surname,
   phone,
-  instrument = "",
-  experienceLevel = "",
-  genre = "",
+  instrument,
+  experienceLevel ,
+  genre ,
   isInBand = false,
-  photo_url = ""
+  photo_url = null
 ) {
   try {
     const result = await dbAsync.run(
@@ -38,6 +38,7 @@ async function createUser(
     return result.id;
 
   } catch (err) {
+    console.log(`ciaoooo`);
     console.error('❌ Error creating user:', err.message);
     throw err;
   }
@@ -71,7 +72,7 @@ async function findUserByEmail(email) {
 async function findUserById(id) {
   try {
     const user = await dbAsync.get(
-      `SELECT id, email, name, surname, phone, bio, instrument, experienceLevel, genre, isInBand, rating, created_at FROM users WHERE id = ?`,
+      `SELECT id, email, name, surname, phone, bio, instrument, experienceLevel, genre, isInBand, created_at FROM users WHERE id = ?`,
       [id]
     );
 
@@ -100,7 +101,7 @@ async function updateUser(idUser, keyField, valueField) {
   'phone',
   'bio',
   'instrument',
-  'genres',
+  'genre',
   'experienceLevel',
   'isInBand',
   'photo_url' 
