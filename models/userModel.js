@@ -142,6 +142,29 @@ async function updateUser(idUser, keyField, valueField) {
   }
 }
 
+
+/**
+ * GET ALL USERS
+ */
+async function getAllUsersInfos() {
+  try {
+    // .all() per avere un array di righe
+    const users = await dbAsync.all(
+      `SELECT * FROM users;`,
+    );
+
+    if (users && users.length > 0) {
+      return users; 
+    } else {
+      return [];
+    }
+
+  } catch (err) { 
+    console.error('❌ Error finding some users:', err.message);
+    throw err;
+  }
+}
+
 /**
  * DELETE USER
  */
@@ -162,5 +185,6 @@ module.exports = {
   findUserByEmail,
   findUserById,
   updateUser,
-  deleteUser
+  deleteUser,
+  getAllUsersInfos
 };

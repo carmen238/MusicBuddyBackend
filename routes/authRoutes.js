@@ -5,7 +5,8 @@ const {
   createUser,
   findUserByEmail,
   findUserById,
-  updateUser
+  updateUser,
+  getAllUsersInfos
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -181,5 +182,31 @@ router.post('/updateFieldUser', async (req, res) => {
     res.status(500).json({ error: 'Update failed ' });
   }
 });
+
+/**
+ * GET ALL USERS
+ */
+router.get('/getAllUsersInfos', async (req, res) => {
+  try {
+    
+    // get all users infos
+    const users = await getAllUsersInfos();
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: 'No users found' }); // Nota: corretto anche l'inglese "Any user found" in "No users found"
+    }
+
+    console.log(`✅ Found users: ${users.length}`);
+
+    res.json({ 
+      message: 'Users retrieved successfully',
+      users: users
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to retrieve users', message: err.message });
+  }
+});
+
 
 module.exports = router;
