@@ -7,6 +7,8 @@ const {
   findUserById,
   updateUser,
   getAllUsersInfos
+  updateUser,
+  getAllUsersInfos
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -22,10 +24,11 @@ router.post('/register', async (req, res) => {
       name,
       surname,
       phone,
-      instrument = "",
-      experienceLevel = "",
-      genre = "",
-      isInBand = false
+      instrument,
+      experienceLevel,
+      genre ,
+      isInBand,
+      photo_url = null
     } = req.body;
 
     // Validate required fields
@@ -44,6 +47,8 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashed = await bcrypt.hash(password, 10);
 
+    
+
     // Create user
     const userId = await createUser(
       email,
@@ -58,11 +63,18 @@ router.post('/register', async (req, res) => {
       photo_url
     );
 
-    console.log(`✅ User registered: ${email} (ID: ${userId})`);
+    console.log(`✅ User registered: ${email} (ID: ${userId})  ${name}   ${surname}   ${phone}   ${photo_url} ${instrument} ${instrument} ${experienceLevel} ${genre} ${isInBand}`);
+
+    const token = jwt.sign(
+      { id: userId},
+      process.env.JWT_SECRET || 'secret',
+      { expiresIn: '24h' }
+    );
 
     res.status(201).json({
       message: 'User created successfully',
-      userId
+      userId,
+      token: token
     });
 
   } catch (err) {
@@ -123,7 +135,7 @@ router.post('/login', async (req, res) => {
 
     res.json({
       message: 'Login successful',
-      token,
+      token: token,
       user: userWithoutPassword
     });
 

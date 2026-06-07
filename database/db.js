@@ -5,39 +5,40 @@ const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'musicbuddy.db'
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('❌ Error opening database:', err.message);
+    console.error('❌ Error opening database:', err);
   } else {
     console.log('✅ Connected to SQLite database');
     initializeDatabase();
   }
 });
 
-function initializeDatabase() {
+const initializeDatabase = () => {
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
-      name TEXT NOT NULL,
-      surname TEXT NOT NULL,
+      name TEXT,
+      surname TEXT,
       phone TEXT,
-      bio TEXT DEFAULT '',
-      instrument TEXT DEFAULT '',
-      experienceLevel TEXT DEFAULT '',
-      genre TEXT DEFAULT '',
-      isInBand INTEGER DEFAULT 0,
-      rating INTEGER DEFAULT 0,
+      bio TEXT,
+      instrument TEXT,
+      experienceLevel TEXT,
+      genre TEXT,
+      isInBand BOOLEAN DEFAULT 0,
+      photo_url TEXT DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `, (err) => {
     if (err) {
-      console.error('❌ Error creating users table:', err.message);
+      console.error('❌ Error creating users table:', err);
     } else {
-      console.log('✅ Users table initialized');
+      console.log('✅ Users table created');
     }
   });
-}
+};
+
 
 const dbAsync = {
   run: (sql, params = []) =>

@@ -1,44 +1,32 @@
 require('dotenv').config();
 const express = require('express');
-const path = require('path');
-const app = express();
-const fs = require('fs');  
 const cors = require('cors');
 const db = require('./database/db');
+
 const authRoutes = require('./routes/authRoutes');
+const photoRoutes = require('./routes/photoRoutes');
 
-
+const app = express();
 const PORT = process.env.PORT || 3000;
-
 
 // Middleware
 app.use(cors());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', photoRoutes);
 
-
-
-// Health check endpoint
+// Health check
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running' });
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
-console.error('Error:', err.message);
+  console.error('Error:', err.message);
   res.status(500).json({ error: 'Internal server error' });
 });
-
-const photoRoutes = require('./routes/photoRoutes');
-
-// Add this line after other route definitions
-app.use('/api/users', photoRoutes);
-
-// Serve uploaded files as static
-app.use('/uploads', express.static('uploads'))
 
 // Start server
 app.listen(PORT, () => {
