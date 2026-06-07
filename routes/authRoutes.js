@@ -7,8 +7,6 @@ const {
   findUserById,
   updateUser,
   getAllUsersInfos
-  updateUser,
-  getAllUsersInfos
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -208,5 +206,31 @@ router.get("/getAllUsersInfos", async (req, res) => {
     });
   }
 });
+
+/**
+ * DELETE A USER
+ */
+router.delete("/deleteUser", async (req, res) => {
+  try {
+    const { id } = req.body;
+    const success = await deleteUser(id)
+        
+    res.status(200).json({
+      success = success,
+      message = "User successfully deleted"
+    });
+
+    console.log(`✅ User successfully deleted`);
+
+  } catch (err) {
+    console.error('❌ Error deleting user:', err.message);
+        
+    res.status(500).json({
+        success = false,
+        message: 'Failed to delete user.'
+    });
+  }
+});
+
 
 module.exports = router;
