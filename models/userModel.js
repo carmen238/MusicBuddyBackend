@@ -148,16 +148,10 @@ async function updateUser(idUser, keyField, valueField) {
  */
 async function deleteUser(id) {
   try {
-    const user = await findUserById(id);
-    if (!user) {
-      console.log(`❌ User not found: ${id}`);
-      return false;
-    }
-    else {
-      await dbAsync.run(`DELETE FROM users WHERE id = ?`, [id]);
-      console.log(`✅ User deleted: ${id}`);
-      return true;
-    }
+    await dbAsync.run(`DELETE FROM users WHERE id = ?`, [id]);
+    console.log(`✅ User deleted: ${id}`);
+    return true;
+
   } catch (err) {
     console.error('❌ Error deleting user:', err.message);
     throw err;

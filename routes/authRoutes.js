@@ -6,8 +6,7 @@ const {
   findUserByEmail,
   findUserById,
   updateUser,
-  getAllUsersInfos,
-  deleteUser
+  getAllUsersInfos
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -137,8 +136,7 @@ router.post('/login', async (req, res) => {
 /**
  * UPDATE FIELD
  */
-
-router.put('/updateFieldUser', async (req, res) => {
+router.post('/updateFieldUser', async (req, res) => {
   try {
     const { idUser, keyField, valueField } = req.body;
 
@@ -194,32 +192,7 @@ router.get("/getAllUsersInfos", async (req, res) => {
         
     res.status(500).json({
         success: false,
-        data: null
-    });
-  }
-});
-
-/**
- * DELETE A USER
- */
-router.delete("/deleteUser", async (req, res) => {
-  try {
-    const { id } = req.body;
-    const success = await deleteUser(id)
-        
-    res.status(200).json({
-      success = success,
-      message = "User successfully deleted"
-    });
-
-    console.log(`✅ User successfully deleted`);
-
-  } catch (err) {
-    console.error('❌ Error deleting user:', err.message);
-        
-    res.status(500).json({
-        success = false,
-        message: 'Failed to delete user.'
+        message: 'Failed to retrieve users.'
     });
   }
 });
