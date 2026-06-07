@@ -32,4 +32,8 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🎵 MusicBuddy Backend running on port ${PORT}`);
   console.log(`📍 Server URL: http://localhost:${PORT}`);
+  console.log(`🔗 Register endpoint: POST http://localhost:${PORT}/api/auth/register`);
+  console.log(`🔗 Login endpoint: POST http://localhost:${PORT}/api/auth/login`);
+  console.log(`🔗 Update Field endpoint: POST http://localhost:${PORT}/api/auth/updateFieldUser`);
+  console.log(`🔗 Retrieve all users infos: GET http://localhost:${PORT}/api/auth/getAllUsersInfos`);
 });

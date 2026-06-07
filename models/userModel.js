@@ -9,16 +9,17 @@ async function createUser(
   name,
   surname,
   phone,
-  instrument,
-  experienceLevel ,
-  genre ,
+  bio = "",
+  instrument = "",
+  experienceLevel = "",
+  genre = "",
   isInBand = false,
   photo_url = null
 ) {
   try {
     const result = await dbAsync.run(
       `INSERT INTO users 
-      (email, password, name, surname, phone, instrument, experienceLevel, genre, isInBand, photo_url)
+      (email, password, name, surname, phone, bio, instrument, experienceLevel, genre, isInBand, photo_url)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         email,
@@ -26,6 +27,7 @@ async function createUser(
         name,
         surname,
         phone,
+        bio,
         instrument,
         experienceLevel,
         genre,
@@ -170,12 +172,32 @@ async function getAllUsersInfos() {
  */
 async function deleteUser(id) {
   try {
-    await dbAsync.run(`DELETE FROM users WHERE id = ?`, [id]);
-    console.log(`✅ User deleted: ${id}`);
-    return true;
-
+    const user = await findUserById(id);
+    if (!user) {
+      console.log(`❌ User not found: ${id}`);
+      return false;
+    }
+    else {
+      await dbAsync.run(`DELETE FROM users WHERE id = ?`, [id]);
+      console.log(`✅ User deleted: ${id}`);
+      return true;
+    }
   } catch (err) {
     console.error('❌ Error deleting user:', err.message);
+    throw err;
+  }
+
+}
+
+/**
+ * GET ALL USERS INFOS
+ */
+async function getAllUsersInfos() {
+  try {
+    const query = 'SELECT id, instrument, experienceLevel, genre, isInBand, rating FROM users';
+    return await dbAsync.all(query);
+  } catch (err) { 
+    console.error('❌ Error finding some users:', err.message);
     throw err;
   }
 }

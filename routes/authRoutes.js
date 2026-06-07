@@ -184,9 +184,38 @@ router.post('/updateFieldUser', async (req, res) => {
 });
 
 /**
- * GET ALL USERS
+ * GET ALL USERS INFOS
  */
-router.get('/getAllUsersInfos', async (req, res) => {
+router.get("/getAllUsersInfos", async (req, res) => {
+  try {
+    const usersInfos = await getAllUsersInfos();
+
+    if (!usersInfos || usersInfos.length === 0) {
+      res.status(404).json({ 
+        success: false,
+        message: 'No users found'
+      });
+      return;
+    }
+        
+    res.status(200).json({
+        success: true,
+        data: usersInfos
+    });
+
+    console.log(`✅ Users infos retrieved`);
+
+  } catch (err) {
+    console.error('❌ Error fetching users:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve users.'
+    });
+  }
+});
+
+/*router.get('/getAllUsersInfos', async (req, res) => {
   try {
     
     // get all users infos
@@ -205,6 +234,31 @@ router.get('/getAllUsersInfos', async (req, res) => {
 
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve users', message: err.message });
+  }
+});*/
+
+/**
+ * DELETE A USER
+ */
+router.delete("/deleteUser", async (req, res) => {
+  try {
+    const { id } = req.body;
+    const success = await deleteUser(id)
+        
+    res.status(200).json({
+      success = success,
+      message = "User successfully deleted"
+    });
+
+    console.log(`✅ User successfully deleted`);
+
+  } catch (err) {
+    console.error('❌ Error deleting user:', err.message);
+        
+    res.status(500).json({
+        success = false,
+        message: 'Failed to delete user.'
+    });
   }
 });
 
