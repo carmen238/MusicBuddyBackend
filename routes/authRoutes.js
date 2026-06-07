@@ -189,6 +189,14 @@ router.post('/updateFieldUser', async (req, res) => {
 router.get("/getAllUsersInfos", async (req, res) => {
   try {
     const usersInfos = await getAllUsersInfos();
+
+    if (!usersInfos || usersInfos.length === 0) {
+      res.status(404).json({ 
+        success: false,
+        message: 'No users found'
+      });
+      return;
+    }
         
     res.status(200).json({
         success: true,
@@ -206,6 +214,28 @@ router.get("/getAllUsersInfos", async (req, res) => {
     });
   }
 });
+
+/*router.get('/getAllUsersInfos', async (req, res) => {
+  try {
+    
+    // get all users infos
+    const users = await getAllUsersInfos();
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: 'No users found' }); // Nota: corretto anche l'inglese "Any user found" in "No users found"
+    }
+
+    console.log(`✅ Found users: ${users.length}`);
+
+    res.json({ 
+      message: 'Users retrieved successfully',
+      users: users
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to retrieve users', message: err.message });
+  }
+});*/
 
 /**
  * DELETE A USER
