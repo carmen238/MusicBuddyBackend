@@ -36,4 +36,5 @@ app.listen(PORT, () => {
   console.log(`🔗 Login endpoint: POST http://localhost:${PORT}/api/auth/login`);
   console.log(`🔗 Update Field endpoint: POST http://localhost:${PORT}/api/auth/updateFieldUser`);
   console.log(`🔗 Retrieve all users infos: GET http://localhost:${PORT}/api/auth/getAllUsersInfos`);
+  console.log(`🔗 Delete a user by id: DELETE http://localhost:${PORT}/api/auth/deleteUser`);
 });

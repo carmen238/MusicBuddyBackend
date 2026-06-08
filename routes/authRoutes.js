@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
       experienceLevel,
       genre ,
       isInBand,
-      photo_url = null
+      photo_url
     } = req.body;
 
     // Validate required fields
@@ -61,7 +61,7 @@ router.post('/register', async (req, res) => {
       photo_url
     );
 
-    console.log(`✅ User registered: ${email} (ID: ${userId})  ${name}   ${surname}   ${phone}   ${photo_url} ${instrument} ${instrument} ${experienceLevel} ${genre} ${isInBand}`);
+    console.log(`✅ User registered: ${email} (ID: ${userId})  ${name}   ${surname}   ${phone}   ${photo_url} ${instrument} ${experienceLevel} ${genre} ${isInBand}`);
 
     const token = jwt.sign(
       { id: userId},
@@ -146,12 +146,12 @@ router.post('/login', async (req, res) => {
 /**
  * UPDATE FIELD
  */
-router.post('/updateFieldUser', async (req, res) => {
+router.patch('/updateFieldUser', async (req, res) => {
   try {
     const { idUser, keyField, valueField } = req.body;
 
     // Validate required fields
-    if (!idUser || !keyField || !valueField) {
+    if (idUser === undefined || keyField === undefined || valueField === undefined) {
       return res.status(400).json({ 
         error: 'Missing required fields: idUser, keyField, valueField' 
       });
@@ -246,8 +246,8 @@ router.delete("/deleteUser", async (req, res) => {
     const success = await deleteUser(id)
         
     res.status(200).json({
-      success = success,
-      message = "User successfully deleted"
+      success: success,
+      message: "User successfully deleted"
     });
 
     console.log(`✅ User successfully deleted`);
@@ -256,7 +256,7 @@ router.delete("/deleteUser", async (req, res) => {
     console.error('❌ Error deleting user:', err.message);
         
     res.status(500).json({
-        success = false,
+        success: false,
         message: 'Failed to delete user.'
     });
   }

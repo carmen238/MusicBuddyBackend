@@ -14,13 +14,13 @@ async function createUser(
   experienceLevel = "",
   genre = "",
   isInBand = false,
-  photo_url = null
+  photo_url
 ) {
   try {
     const result = await dbAsync.run(
       `INSERT INTO users 
       (email, password, name, surname, phone, bio, instrument, experienceLevel, genre, isInBand, photo_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         email,
         hashedPassword,
@@ -144,29 +144,6 @@ async function updateUser(idUser, keyField, valueField) {
   }
 }
 
-
-/**
- * GET ALL USERS
- */
-async function getAllUsersInfos() {
-  try {
-    // .all() per avere un array di righe
-    const users = await dbAsync.all(
-      `SELECT * FROM users;`,
-    );
-
-    if (users && users.length > 0) {
-      return users; 
-    } else {
-      return [];
-    }
-
-  } catch (err) { 
-    console.error('❌ Error finding some users:', err.message);
-    throw err;
-  }
-}
-
 /**
  * DELETE USER
  */
@@ -194,7 +171,7 @@ async function deleteUser(id) {
  */
 async function getAllUsersInfos() {
   try {
-    const query = 'SELECT id, instrument, experienceLevel, genre, isInBand, rating FROM users';
+    const query = 'SELECT id, instrument, experienceLevel, genre, isInBand FROM users';
     return await dbAsync.all(query);
   } catch (err) { 
     console.error('❌ Error finding some users:', err.message);
