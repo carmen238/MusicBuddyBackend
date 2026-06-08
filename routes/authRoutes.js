@@ -22,6 +22,7 @@ router.post('/register', async (req, res) => {
       name,
       surname,
       phone,
+      bio,
       instrument,
       experienceLevel,
       genre ,
@@ -45,7 +46,9 @@ router.post('/register', async (req, res) => {
     // Hash password
     const hashed = await bcrypt.hash(password, 10);
 
-    
+    var photo_url2;
+
+    if(photo_url == undefined) photo_url2 = "";   //fix un po' ignorante, ma ha funzionato
 
     // Create user
     const userId = await createUser(
@@ -54,11 +57,12 @@ router.post('/register', async (req, res) => {
       name,
       surname,
       phone,
+      bio,
       instrument,
       experienceLevel,
       genre,
       isInBand,
-      photo_url
+      photo_url2
     );
 
     console.log(`✅ User registered: ${email} (ID: ${userId})  ${name}   ${surname}   ${phone}   ${photo_url} ${instrument} ${experienceLevel} ${genre} ${isInBand}`);

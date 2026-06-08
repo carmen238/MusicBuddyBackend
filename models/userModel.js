@@ -9,7 +9,7 @@ async function createUser(
   name,
   surname,
   phone,
-  bio = "",
+  bio,
   instrument = "",
   experienceLevel = "",
   genre = "",
