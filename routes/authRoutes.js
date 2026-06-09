@@ -6,6 +6,7 @@ const {
   findUserByEmail,
   findUserById,
   updateUser,
+  deleteUser,
   getAllUsersInfos
 } = require('../models/userModel');
 
@@ -101,6 +102,7 @@ router.post('/login', async (req, res) => {
 
     // Find user
     const user = await findUserByEmail(email);
+    console.log(`Bio: ${user.bio}`);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -223,9 +225,9 @@ router.get("/getAllUsersInfos", async (req, res) => {
 /**
  * DELETE A USER
  */
-router.delete("/deleteUser", async (req, res) => {
+router.post("/deleteUser", async (req, res) => {
   try {
-    const { id } = req.body;
+    const id = req.body.userId;
     const success = await deleteUser(id)
         
     res.status(200).json({
