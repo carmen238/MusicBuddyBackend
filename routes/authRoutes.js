@@ -102,7 +102,6 @@ router.post('/login', async (req, res) => {
 
     // Find user
     const user = await findUserByEmail(email);
-    console.log(`Bio: ${user.bio}`);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
