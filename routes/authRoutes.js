@@ -7,7 +7,9 @@ const {
   findUserById,
   updateUser,
   deleteUser,
-  getAllUsersInfos
+  getAllUsersInfos,
+  getGenresStats,
+  getInstrumentsStats
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -49,7 +51,7 @@ router.post('/register', async (req, res) => {
 
     var photo_url2;
 
-    if(photo_url == undefined) photo_url2 = "";   //fix un po' ignorante, ma ha funzionato
+    if(photo_url === undefined) photo_url2 = "";   //fix un po' ignorante, ma ha funzionato
 
     // Create user
     const userId = await createUser(
@@ -66,7 +68,7 @@ router.post('/register', async (req, res) => {
       photo_url2
     );
 
-    console.log(`✅ User registered: ${email} (ID: ${userId})  ${name}   ${surname}   ${phone}   ${photo_url} ${instrument} ${experienceLevel} ${genre} ${isInBand}`);
+    console.log(`✅ User registered: ${email} (ID: ${userId})  ${name}   ${surname}   ${phone}   ${photo_url2} ${instrument} ${experienceLevel} ${genre} ${isInBand}`);
 
     const token = jwt.sign(
       { id: userId},
@@ -197,7 +199,7 @@ router.get("/getAllUsersInfos", async (req, res) => {
     const usersInfos = await getAllUsersInfos();
     //VA IN ERRORE LATO CLIENT PER COLPA DI isInBand CHE è NUMERO INVECE DI BOOLEANO
 
-    if (!usersInfos || usersInfos.length === 0) {
+    if (!usersInfos || usersInfos.length == 0) {
       res.status(404).json({ 
         success: false,
         message: 'No users found'
@@ -228,7 +230,7 @@ router.get("/getAllUsersInfos", async (req, res) => {
 router.post("/deleteUser", async (req, res) => {
   try {
     const id = req.body.userId;
-    const success = await deleteUser(id)
+    const success = await deleteUser(id);
         
     res.status(200).json({
       success: success,
@@ -247,5 +249,74 @@ router.post("/deleteUser", async (req, res) => {
   }
 });
 
+/**
+ * GET GENRES STATISTICS
+ */
+router.get("/getGenresStats", async (req, res) => {
+  try {
+    const genresStats = await getGenresStats();
+
+    if (!genresStats || genresStats.length == 0) {
+      res.status(404).json({ 
+        success: false,
+        data: null,
+        message: 'No genres found'
+      });
+      return;
+    }
+        
+    res.status(200).json({
+        success: true,
+        data: genresStats,
+        message: 'Genres stats retrieved successfully'
+    });
+
+    console.log(`✅ Genres stats retrieved`);
+
+  } catch (err) {
+    console.error('❌ Error fetching genres stats:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        data: null,
+        message: 'Failed to retrieve genres stats.'
+    });
+  }
+});
+
+/**
+ * GET INSTRUMENTS STATISTICS
+ */
+router.get("/getInstrumentsStats", async (req, res) => {
+  try {
+    const instrumentsStats = await getInstrumentsStats();
+
+    if (!instrumentsStats || instrumentsStats.length === 0) {
+      res.status(404).json({ 
+        success: false,
+        data: null,
+        message: 'No instruments found'
+      });
+      return;
+    }
+        
+    res.status(200).json({
+        success: true,
+        data: instrumentsStats,
+        message: 'Instruments stats retrieved successfully'
+    });
+
+    console.log(`✅ Instruments stats retrieved`);
+
+  } catch (err) {
+    console.error('❌ Error fetching instruments stats:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        data: null,
+        message: 'Failed to retrieve instruments stats.'
+    });
+  }
+});
 
 module.exports = router;

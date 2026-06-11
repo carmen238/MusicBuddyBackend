@@ -179,11 +179,39 @@ async function getAllUsersInfos() {
   }
 }
 
+/**
+ * GET GENRES STATISTICS
+ */
+async function getGenresStats() {
+  try {
+    const query = 'SELECT genre, COUNT(*) AS total FROM users GROUP BY genre ORDER BY total DESC';
+    return await dbAsync.all(query);
+  } catch (err) { 
+    console.error('❌ Error in counting genres:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * GET INSTRUMENTS STATISTICS
+ */
+async function getInstrumentsStats() {
+  try {
+    const query = 'SELECT instrument, COUNT(*) AS total FROM users GROUP BY instrument ORDER BY total DESC';
+    return await dbAsync.all(query);
+  } catch (err) { 
+    console.error('❌ Error in counting instruments:', err.message);
+    throw err;
+  }
+}
+
 module.exports = {
   createUser,
   findUserByEmail,
   findUserById,
   updateUser,
   deleteUser,
-  getAllUsersInfos
+  getAllUsersInfos,
+  getGenresStats,
+  getInstrumentsStats
 };
