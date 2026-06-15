@@ -9,7 +9,8 @@ const {
   deleteUser,
   getAllUsersInfos,
   getGenresStats,
-  getInstrumentsStats
+  getInstrumentsStats,
+  getTotNumUsers
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -192,7 +193,7 @@ router.patch('/updateFieldUser', async (req, res) => {
 });
 
 /**
- * GET ALL USERS INFOS
+ * GET ALL USERS INFOS (NON SERVE)
  */
 router.get("/getAllUsersInfos", async (req, res) => {
   try {
@@ -315,6 +316,42 @@ router.get("/getInstrumentsStats", async (req, res) => {
         success: false,
         data: null,
         message: 'Failed to retrieve instruments stats.'
+    });
+  }
+});
+
+/**
+ * GET TOTAL NUMBER OF USERS
+ */
+router.get("/getTotNumUsers", async (req, res) => {
+  try {
+    const result = await getTotNumUsers();
+    const totalUsers = result[0].tot_users;
+
+    if (!totalUsers || totalUsers == 0) {
+      res.status(404).json({ 
+        success: false,
+        totNumUsers: 0,
+        message: 'No users found'
+      });
+      return;
+    }
+        
+    res.status(200).json({
+        success: true,
+        totNumUsers: totalUsers,
+        message: 'Users number retrieved successfully'
+    });
+
+    console.log(`✅ Instruments stats retrieved`);
+
+  } catch (err) {
+    console.error('❌ Error fetching users number:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        totNumUsers: -1,
+        message: 'Failed to retrieve users number.'
     });
   }
 });

@@ -205,6 +205,19 @@ async function getInstrumentsStats() {
   }
 }
 
+/**
+ * GET TOTAL NUMBER OF USERS
+ */
+async function getTotNumUsers() {
+  try {
+    const query = 'SELECT COUNT(*) as tot_users FROM users';
+    return await dbAsync.all(query);
+  } catch (err) { 
+    console.error('❌ Error in counting instruments:', err.message);
+    throw err;
+  }
+}
+
 module.exports = {
   createUser,
   findUserByEmail,
@@ -213,5 +226,6 @@ module.exports = {
   deleteUser,
   getAllUsersInfos,
   getGenresStats,
-  getInstrumentsStats
+  getInstrumentsStats,
+  getTotNumUsers
 };
