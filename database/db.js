@@ -13,6 +13,12 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 const initializeDatabase = () => {
+  // Attivazione delle foreign keys per questa connessione
+  db.run('PRAGMA foreign_keys = ON;', (err) => {
+      if (err) console.error("Error while activating FK:", err.message);
+      else console.log("✅ Foreign keys activated successfully.");
+  });
+
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,15 +33,39 @@ const initializeDatabase = () => {
       genre TEXT,
       isInBand BOOLEAN DEFAULT 0,
       photo_url TEXT DEFAULT NULL,
+      latitude DOUBLE DEFAULT 0.0,
+      longitude DOUBLE DEFAULT 0.0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
+    );
   `, (err) => {
     if (err) {
       console.error('❌ Error creating users table:', err);
     } else {
       console.log('✅ Users table created');
     }
+  });
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS friendships (
+      friendship_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sender_id INTEGER,
+      receiver_id INTEGER,
+      status TEXT,
+      sender_last_chat_message TEXT DEFAULT '',
+      receiver_last_chat_message TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT unique_friendship UNIQUE (sender_id, receiver_id),
+      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `, (err) => {
+    if (err) {
+      console.error('❌ Error creating users table:', err);
+    } else {
+      console.log('✅ Users table created');
+    }   //status deve essere 'PENDING','ACCEPTED' o 'REJECTED' (quest'ultimo opzionale, puoi semplicemente eliminare la riga)
   });
 };
 
