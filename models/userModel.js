@@ -218,6 +218,46 @@ async function getTotNumUsers() {
   }
 }
 
+/**
+ * UPDATE USER LOCATION
+ */
+async function postUserLocation(idUser, latitude, longitude) {
+  try {
+    // Verifica che l'utente esista
+    const user = await findUserById(idUser);
+    if (!user) {
+      console.log(`❌ User not found: ${idUser}`);
+      return false;
+    }
+
+    // Esegui l'update
+    await dbAsync.run(
+      `UPDATE users SET latitude = ?, longitude = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+      [latitude, longitude, idUser]  // ✅ CORRETTO: idUser al posto di id
+    );
+    
+    return true;
+
+  } catch (err) {
+    console.error(`❌ Error updating user location: ${err.message}`);
+    return false;
+  }
+}
+
+/**
+ * GET USER LOCATION FROM DATABASE (NON SERVE, TANTO LA PRENDE DALL'API DI GOOGLE MAPS)
+ */
+async function getUserLocation(idUser, keyField, valueField) {
+  //DA IMPLEMENTARE
+}
+
+/**
+ * FETCH NEARBY MUSICIANS INFO
+ */
+async function getNearbyMusicians(idUser, keyField, valueField) {
+  //DA IMPLEMENTARE
+}
+
 module.exports = {
   createUser,
   findUserByEmail,
@@ -227,5 +267,8 @@ module.exports = {
   getAllUsersInfos,
   getGenresStats,
   getInstrumentsStats,
-  getTotNumUsers
+  getTotNumUsers,
+  postUserLocation,
+  getUserLocation,
+  getNearbyMusicians
 };

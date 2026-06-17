@@ -10,7 +10,10 @@ const {
   getAllUsersInfos,
   getGenresStats,
   getInstrumentsStats,
-  getTotNumUsers
+  getTotNumUsers,
+  postUserLocation,
+  getUserLocation,
+  getNearbyMusicians
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -351,6 +354,48 @@ router.get("/getTotNumUsers", async (req, res) => {
         success: false,
         totNumUsers: -1,
         message: 'Failed to retrieve users number.'
+    });
+  }
+});
+
+/**
+ * UPDATE USER LOCATION
+ */
+router.patch('/postUserLocation', async (req, res) => {
+  try {
+    const { userId, latValue, longValue } = req.body;
+    //console.log(` ${userId}, ${latValue}, ${longValue}`);
+
+    // Validate required fields
+    if (userId === undefined || latValue === undefined || longValue === undefined) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid location update' 
+      });
+    }
+
+    // Update user field
+    const result = await postUserLocation(userId, latValue, longValue);
+
+    if (!result) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    console.log(`✅ User location updated`);
+
+    res.status(200).json({ 
+      success: true,
+      message: 'User location updated correctly'
+    });
+
+  } catch (err) {
+    console.error('❌ Location update error:', err.message);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error during user location update'
     });
   }
 });
