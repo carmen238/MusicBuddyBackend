@@ -248,14 +248,42 @@ async function postUserLocation(idUser, latitude, longitude) {
  * GET USER LOCATION FROM DATABASE (NON SERVE, TANTO LA PRENDE DALL'API DI GOOGLE MAPS)
  */
 async function getUserLocation(idUser, keyField, valueField) {
-  //DA IMPLEMENTARE
+  //...
 }
 
 /**
  * FETCH NEARBY MUSICIANS INFO
  */
-async function getNearbyMusicians(idUser, keyField, valueField) {
-  //DA IMPLEMENTARE
+async function getNearbyMusicians(userId, userLat, userLong, range) {
+  try {
+    const radius = range/2;
+    const latDelta = radius/111.0;
+    const latInRadians = (userLat * Math.PI) / 180;
+    // 1 grado di longitudine dipende dalla latitudine attuale
+    const kmPerDegreeLong = 111.32 * Math.cos(latInRadians);
+    const longDelta = radius / kmPerDegreeLong;
+    const query = 'SELECT id, name, surname, instrument, experienceLevel, genre, isInBand, photo_url, latitude, longitude FROM users WHERE ABS(? - latitude) < ? AND ABS(? - longitude) < ? AND id != ?';
+    return await dbAsync.all(query, [userLat, latDelta, userLong, longDelta, userId]);
+  } catch (err) { 
+    console.error('❌ Error in fetching nearby musicians:', err.message);
+    throw err;
+  }
+}
+
+async function sendFriendRequest(senderId, receiverId) {
+  try {
+    const result = await dbAsync.run(
+      `INSERT INTO friendships (sender_id, receiver_id, status) VALUES (?, ?, ?)`,
+      [senderId, receiverId, "PENDING"]
+    );
+
+    console.log(`✅ Friend request sent to user ${receiverId}`);
+    return true;
+
+  } catch (err) {
+    console.error('❌ Error sending friend request:', err.message);
+    return false;
+  }
 }
 
 module.exports = {
@@ -270,5 +298,6 @@ module.exports = {
   getTotNumUsers,
   postUserLocation,
   getUserLocation,
-  getNearbyMusicians
+  getNearbyMusicians,
+  sendFriendRequest
 };

@@ -13,7 +13,8 @@ const {
   getTotNumUsers,
   postUserLocation,
   getUserLocation,
-  getNearbyMusicians
+  getNearbyMusicians,
+  sendFriendRequest
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -396,6 +397,74 @@ router.patch('/postUserLocation', async (req, res) => {
     res.status(500).json({ 
       success: false,
       message: 'Error during user location update'
+    });
+  }
+});
+
+/**
+ * FETCH NEARBY MUSICIANS
+ */
+router.post('/getNearbyMusicians', async (req, res) => {
+  try {
+    const {userId, userLat, userLong, range} = req.body;
+    const nearbyMusicians = await getNearbyMusicians(userId, userLat, userLong, range);
+
+    if (!nearbyMusicians || nearbyMusicians.length === 0) {
+      res.status(404).json({ 
+        success: false,
+        data: null,
+        message: 'No nearby musician found'
+      });
+      return;
+    }
+        
+    res.status(200).json({
+        success: true,
+        data: nearbyMusicians,
+        message: 'Nearby musicians retrieved successfully'
+    });
+
+    console.log(`✅ Nearby musicians infos retrieved`);
+
+  } catch (err) {
+    console.error('❌ Error fetching nearby musicians infos:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        data: null,
+        message: 'Failed to retrieve nearby musicians infos.'
+    });
+  }
+});
+
+/**
+ * SEND FRIEND REQUEST
+ */
+router.post('/sendFriendRequest', async (req, res) => {
+  try {
+    const {userId, friendId} = req.body;
+    const result = await sendFriendRequest(userId, friendId);
+
+    if (!result) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Error during sending request'
+      });
+    }
+        
+    res.status(200).json({
+        success: true,
+        message: 'Friend request sent successfully'
+    });
+
+    console.log(`✅ Friend request sent successfully`);
+
+  } catch (err) {
+    console.error('❌ Error during sending request:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        message: 'Error during sending request.'
     });
   }
 });
