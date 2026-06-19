@@ -270,6 +270,9 @@ async function getNearbyMusicians(userId, userLat, userLong, range) {
   }
 }
 
+/**
+ * SEND A FRIEND REQUEST, SETTING IT TO "PENDING"
+ */
 async function sendFriendRequest(senderId, receiverId) {
   try {
     const result = await dbAsync.run(
@@ -282,6 +285,73 @@ async function sendFriendRequest(senderId, receiverId) {
 
   } catch (err) {
     console.error('❌ Error sending friend request:', err.message);
+    return false;
+  }
+}
+
+/**
+ * GET ALL FRIENDS INFOS
+ */
+async function getAllFriends(userId) {
+  try {
+    const query = 'SELECT users.id, users.name, users.surname, users.phone, users.bio, users.instrument, users.experienceLevel, users.genre, users.id, users.isInBand, users.photo_url, friendships.sender_id, friendships.receiver_id, friendships.status FROM users JOIN friendships ON users.id = friendships.sender_id OR users.id = friendships.receiver_id WHERE users.id != ?';
+    return await dbAsync.all(query, [userId]);
+  } catch (err) { 
+    console.error('❌ Error finding friends:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * ACCEPT A FRIEND REQUEST, SETTING IT TO "ACCEPTED"
+ */
+async function acceptFriendRequest(senderId, receiverId) {
+  //In questo caso il receiverId è l'utente che accetta
+  try {
+    await dbAsync.run(
+      `UPDATE friendships SET status = "ACCEPTED", updated_at = CURRENT_TIMESTAMP WHERE sender_id = ? AND receiver_id = ?`,
+      [senderId, receiverId]
+    );
+
+    console.log(`✅ Friend request accepted between users ${receiverId} and ${senderId}`);
+    return true;
+
+  } catch (err) {
+    console.error('❌ Error sending friend request:', err.message);
+    return false;
+  }
+}
+
+/**
+ * REJECT A FRIEND REQUEST
+ */
+/*async function rejectFriendRequest(senderId, receiverId) {
+  //In questo caso il receiverId è l'utente che rifiuta
+  try {
+    await dbAsync.run(`DELETE FROM friendships WHERE sender_id = ? AND receiver_id = ?`, [senderId, receiverId]);
+
+    console.log(`✅ Friend request rejected between users ${receiverId} and ${senderId}`);
+    return true;
+
+  } catch (err) {
+    console.error('❌ Error rejecting friend request:', err.message);
+    return false;
+  }
+}*/
+
+/**
+ * DELETE A FRIEND REQUEST
+ */
+async function deleteFriendRequest(senderId, receiverId) {
+  //Nel caso di cancellazione della richiesta, il senderId è l'utente che cancella la richiesta, altrimenti se una richiesta è rigettata è il contrario (gestito lato client)
+  try {
+    await dbAsync.run(`DELETE FROM friendships WHERE sender_id = ? AND receiver_id = ?`, [senderId, receiverId]);
+
+    console.log(`✅ Friend request rejected between users ${receiverId} and ${senderId}`);
+    return true;
+
+  } catch (err) {
+    console.error('❌ Error rejecting friend request:', err.message);
     return false;
   }
 }
@@ -299,5 +369,11 @@ module.exports = {
   postUserLocation,
   getUserLocation,
   getNearbyMusicians,
-  sendFriendRequest
+  sendFriendRequest,
+  getAllFriends,
+  acceptFriendRequest,
+  deleteFriendRequest
 };
+
+//COMANDO PER INSERIRE USER A MANO DA TERMINALE (CAMBIARE STRINGHE A PIACERE):
+//INSERT INTO users (email, password, name, surname, phone, bio, instrument, experienceLevel, genre, isInBand, photo_url, latitude, longitude) VALUES ("marius@hhh.it", "$w9ufhw98tt9382r8939g2390", "Marius", "Spurius", "2828282828", "", "Bass", "Advanced", "Metal", 1, "", 37.413, -122.089);

@@ -14,7 +14,10 @@ const {
   postUserLocation,
   getUserLocation,
   getNearbyMusicians,
-  sendFriendRequest
+  sendFriendRequest,
+  getAllFriends,
+  acceptFriendRequest,
+  deleteFriendRequest
 } = require('../models/userModel');
 
 const router = express.Router();
@@ -442,8 +445,8 @@ router.post('/getNearbyMusicians', async (req, res) => {
  */
 router.post('/sendFriendRequest', async (req, res) => {
   try {
-    const {userId, friendId} = req.body;
-    const result = await sendFriendRequest(userId, friendId);
+    const {senderId, receiverId} = req.body;
+    const result = await sendFriendRequest(senderId, receiverId);
 
     if (!result) {
       return res.status(404).json({ 
@@ -465,6 +468,108 @@ router.post('/sendFriendRequest', async (req, res) => {
     res.status(500).json({
         success: false,
         message: 'Error during sending request.'
+    });
+  }
+});
+
+/**
+ * GET USER'S FRIENDS
+ */
+router.post('/getAllFriends', async (req, res) => {
+  try {
+    const {userId} = req.body;
+    const allFriends = await getAllFriends(userId);
+
+    if (!allFriends || allFriends.length === 0) {
+      res.status(404).json({ 
+        success: false,
+        data: null,
+        message: 'No friends found'
+      });
+      return;
+    }
+        
+    res.status(200).json({
+        success: true,
+        data: allFriends,
+        message: 'Friends retrieved successfully'
+    });
+
+    console.log(`✅ Friends infos retrieved`);
+
+  } catch (err) {
+    console.error('❌ Error fetching friends infos:', err.message);
+        
+    res.status(500).json({
+        success: false,
+        data: null,
+        message: 'Failed to retrieve friends infos.'
+    });
+  }
+});
+
+/**
+ * ACCEPT FRIEND REQUEST
+ */
+router.patch('/acceptFriendRequest', async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
+
+    // Update user field
+    const result = await acceptFriendRequest(senderId, receiverId);
+
+    if (!result) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Error during accepting friend request'
+      });
+    }
+
+    console.log(`✅ Friend request accepted`);
+
+    res.status(200).json({ 
+      success: true,
+      message: 'Friend request accepted correctly'
+    });
+
+  } catch (err) {
+    console.error('❌ Friend request acceptance error:', err.message);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error during accepting friend request'
+    });
+  }
+});
+
+/**
+ * DELETE FRIEND REQUEST (è una POST perché DELETE non accetta un body in Retrofit)
+ */
+router.post('/deleteFriendRequest', async (req, res) => {
+  try {
+    const { senderId, receiverId } = req.body;
+
+    // Update user field
+    const result = await deleteFriendRequest(senderId, receiverId);
+
+    if (!result) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Error during adeleting friend request'
+      });
+    }
+
+    console.log(`✅ Friend request deleted`);
+
+    res.status(200).json({ 
+      success: true,
+      message: 'Friend request deleted correctly'
+    });
+
+  } catch (err) {
+    console.error('❌ Friend request deletion error:', err.message);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error during accepting friend request'
     });
   }
 });
