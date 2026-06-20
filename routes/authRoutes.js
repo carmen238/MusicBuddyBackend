@@ -569,7 +569,7 @@ router.post('/deleteFriendRequest', async (req, res) => {
     console.error('❌ Friend request deletion error:', err.message);
     res.status(500).json({ 
       success: false,
-      message: 'Error during accepting friend request'
+      message: 'Error during deleting friend request'
     });
   }
 });
