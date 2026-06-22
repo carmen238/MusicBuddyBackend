@@ -266,7 +266,7 @@ router.get("/getGenresStats", async (req, res) => {
     if (!genresStats || genresStats.length == 0) {
       res.status(404).json({ 
         success: false,
-        data: null,
+        data: [],
         message: 'No genres found'
       });
       return;
@@ -285,7 +285,7 @@ router.get("/getGenresStats", async (req, res) => {
         
     res.status(500).json({
         success: false,
-        data: null,
+        data: [],
         message: 'Failed to retrieve genres stats.'
     });
   }
@@ -301,7 +301,7 @@ router.get("/getInstrumentsStats", async (req, res) => {
     if (!instrumentsStats || instrumentsStats.length === 0) {
       res.status(404).json({ 
         success: false,
-        data: null,
+        data: [],
         message: 'No instruments found'
       });
       return;
@@ -320,7 +320,7 @@ router.get("/getInstrumentsStats", async (req, res) => {
         
     res.status(500).json({
         success: false,
-        data: null,
+        data: [],
         message: 'Failed to retrieve instruments stats.'
     });
   }
@@ -411,11 +411,12 @@ router.post('/getNearbyMusicians', async (req, res) => {
   try {
     const {userId, userLat, userLong, range} = req.body;
     const nearbyMusicians = await getNearbyMusicians(userId, userLat, userLong, range);
+    console.log(`nearby mus: ${nearbyMusicians}`);
 
     if (!nearbyMusicians || nearbyMusicians.length === 0) {
-      res.status(404).json({ 
-        success: false,
-        data: null,
+      res.status(200).json({ 
+        success: true,
+        data: [],
         message: 'No nearby musician found'
       });
       return;
@@ -434,7 +435,7 @@ router.post('/getNearbyMusicians', async (req, res) => {
         
     res.status(500).json({
         success: false,
-        data: null,
+        data: [],
         message: 'Failed to retrieve nearby musicians infos.'
     });
   }
@@ -483,7 +484,7 @@ router.post('/getAllFriends', async (req, res) => {
     if (!allFriends || allFriends.length === 0) {
       res.status(404).json({ 
         success: false,
-        data: null,
+        data: [],
         message: 'No friends found'
       });
       return;
@@ -502,7 +503,7 @@ router.post('/getAllFriends', async (req, res) => {
         
     res.status(500).json({
         success: false,
-        data: null,
+        data: [],
         message: 'Failed to retrieve friends infos.'
     });
   }

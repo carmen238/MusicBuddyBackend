@@ -1,0 +1,5 @@
+node_modules
+.env
+database/musicbuddy.db
+npm-debug.log
+.git

@@ -38,3 +38,5 @@ app.listen(PORT, () => {
   console.log(`🔗 Retrieve all users infos: GET http://localhost:${PORT}/api/auth/getAllUsersInfos`);
   console.log(`🔗 Delete a user by id: DELETE http://localhost:${PORT}/api/auth/deleteUser`);
 });
+
+//AVVIARE SERVER CON docker compose up --build

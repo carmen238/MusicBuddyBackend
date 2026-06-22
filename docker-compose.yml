@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  musicbuddy-api:
+    build: .
+    container_name: musicbuddy_backend
+    ports:
+      - "3000:3000" # Assicurati che la porta interna coincida con quella del tuo server Express
+    env_file:
+      - .env # Docker leggerà le variabili (Cloudinary, JWT, ecc.) direttamente dal tuo file .env
+    volumes:
+      # Questo volume salva il database SQLite sul server ospite, rendendolo persistente
+      - sqlite_data:/usr/src/app/database
+    restart: always
+
+volumes:
+  sqlite_data:
