@@ -40,46 +40,55 @@ const clients = new Map(); // userId -> websocket
 console.log("CLIENTS:", Array.from(clients.keys()));
 
 wss.on("connection", (ws) => {
-    console.log("Client connesso");
+  console.log("Client connesso");
 
-    ws.on("message", (message) => {
-        try {
-            const data = JSON.parse(message);
-           console.log("FROM:", data.from);
-           console.log("TO:", data.to);
-           console.log("DATAAA:", data);
-            switch (data.type) {
-                case "REGISTER":
-                    clients.set(data.userId, ws);
-                    // Memorizza l'id nel socket per la rimozione alla disconnessione
-                    ws.userId = data.userId; 
-                    console.log("Registrato:", data.userId);
-                    break;
+  ws.on("message", (message) => {
+    try {
+      const data = JSON.parse(message);
+      console.log("FROM:", data.from);
+      console.log("TO:", data.to);
+      console.log("all data:", data);
+      switch (data.type) {
+        case "REGISTER":
+          clients.set(data.userId, ws);
+          // Memorizza l'id nel socket per la rimozione alla disconnessione
+          ws.userId = data.userId;
+          console.log("Registrato:", Array.from(clients.keys()));
+          break;
+        case "MESSAGE":
 
-                case "MESSAGE":
-                    const receiverSocket = clients.get(data.to);
-                    if (receiverSocket && receiverSocket.readyState === WebSocket.OPEN) {
-                        receiverSocket.send(JSON.stringify({
-                            type: "MESSAGE",
-                            text: data.text,
-                            from: data.from
-                        }));
-                    }
-                    break;
-            }
-        } catch (err) {
-            console.error("Errore nel parsing del messaggio:", err.message);
-        }
-    });
+          const messagePayload = JSON.stringify({
+            type: "MESSAGE",
+            text: data.text,
+            from: data.from
+          });
 
-    ws.on("close", () => {
-        if (ws.userId) {
-            clients.delete(ws.userId);
-            console.log(`Client disconnesso ed eliminato: ${ws.userId}`);
-        } else {
-            console.log("Client disconnesso senza registrazione");
-        }
-    });
+          // manda al destinatario
+          const receiverSocket = clients.get(data.to);
+          if (receiverSocket && receiverSocket.readyState === WebSocket.OPEN) {
+            receiverSocket.send(messagePayload);
+          }
+
+          // manda  al mittente
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(messagePayload);
+          }
+
+          break;
+      }
+    } catch (err) {
+      console.error("Errore nel parsing del messaggio:", err.message);
+    }
+  });
+
+  ws.on("close", () => {
+    if (ws.userId) {
+      clients.delete(ws.userId);
+      console.log(`Client disconnesso ed eliminato: ${ws.userId}`);
+    } else {
+      console.log("Client disconnesso senza registrazione");
+    }
+  });
 });
 
 // 5. Avvia il server HTTP (che ascolta sia Express che WebSocket)
