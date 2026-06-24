@@ -575,4 +575,73 @@ router.post('/deleteFriendRequest', async (req, res) => {
   }
 });
 
+/**
+ * GET MESSAGES OF A CHAT
+ */
+router.get("/chat/messages/:chatId", async (req, res) => {
+  try {
+    const { chatId } = req.params;
+
+    const messages = await getMessages(chatId);
+
+    if (!messages || messages.length === 0) {
+      return res.status(404).json({
+        success: false,
+        messages: [],
+        message: "No messages found"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      messages,
+      message: "Messages retrieved successfully"
+    });
+
+    console.log(`✅ Messages retrieved for chatId: ${chatId}`);
+
+  } catch (err) {
+    console.error('❌ Error fetching messages:', err.message);
+
+    res.status(500).json({
+      success: false,
+      messages: [],
+      message: 'Failed to retrieve messages.'
+    });
+  }
+});
+
+/**
+ * INSERT A MESSAGE INTO A CHAT
+ */
+router.post("/chat/messages", async (req, res) => {
+  try {
+    const message = req.body;
+
+    if (!message || !message.id || !message.chatId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid message payload"
+      });
+    }
+
+    await insertMessage(message);
+
+    res.status(200).json({
+      success: true,
+      message: "Message saved successfully"
+    });
+
+    console.log(`✅ Message saved in chatId: ${message.chatId}`);
+
+  } catch (err) {
+    console.error('❌ Error saving message:', err.message);
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to save message.'
+    });
+  }
+});
+
 module.exports = router;

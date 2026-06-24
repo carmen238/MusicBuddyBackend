@@ -7,6 +7,7 @@ const db = require('./database/db');
 
 const authRoutes = require('./routes/authRoutes');
 const photoRoutes = require('./routes/photoRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', photoRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -45,9 +47,7 @@ wss.on("connection", (ws) => {
   ws.on("message", (message) => {
     try {
       const data = JSON.parse(message);
-      console.log("FROM:", data.from);
-      console.log("TO:", data.to);
-      console.log("all data:", data);
+    
       switch (data.type) {
         case "REGISTER":
           clients.set(data.userId, ws);
@@ -57,22 +57,19 @@ wss.on("connection", (ws) => {
           break;
         case "MESSAGE":
 
-          const messagePayload = JSON.stringify({
+          const payload = JSON.stringify({
             type: "MESSAGE",
             text: data.text,
-            from: data.from
+            from: data.from,
+            chatId: data.chatId
           });
 
-          // manda al destinatario
-          const receiverSocket = clients.get(data.to);
-          if (receiverSocket && receiverSocket.readyState === WebSocket.OPEN) {
-            receiverSocket.send(messagePayload);
-          }
-
-          // manda  al mittente
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(messagePayload);
-          }
+          // invia a tutti (versione semplice)
+          wss.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(payload);
+            }
+          });
 
           break;
       }
