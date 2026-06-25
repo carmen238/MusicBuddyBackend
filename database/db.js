@@ -15,8 +15,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
 const initializeDatabase = () => {
   // Attivazione delle foreign keys per questa connessione
   db.run('PRAGMA foreign_keys = ON;', (err) => {
-      if (err) console.error("Error while activating FK:", err.message);
-      else console.log("✅ Foreign keys activated successfully.");
+    if (err) console.error("Error while activating FK:", err.message);
+    else console.log("✅ Foreign keys activated successfully.");
   });
 
   db.run(`
@@ -66,6 +66,24 @@ const initializeDatabase = () => {
     } else {
       console.log('✅ Users table created');
     }   //status deve essere 'PENDING','ACCEPTED' o 'REJECTED' (quest'ultimo opzionale, puoi semplicemente eliminare la riga)
+  });
+
+  db.run(`
+  CREATE TABLE IF NOT EXISTS messages (
+    id TEXT PRIMARY KEY,
+    chatId TEXT NOT NULL,
+    senderId INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+
+    FOREIGN KEY (senderId) REFERENCES users(id) ON DELETE CASCADE
+  );
+`, (err) => {
+    if (err) {
+      console.error('❌ Error creating messages table:', err);
+    } else {
+      console.log('✅ Messages table created');
+    }
   });
 };
 

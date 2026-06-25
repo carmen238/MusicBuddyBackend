@@ -356,6 +356,59 @@ async function deleteFriendRequest(senderId, receiverId) {
   }
 }
 
+/**
+ * GET MESSAGES OF A CHAT
+ */
+async function getMessages(chatId) {
+  try {
+    console.log("Fetching messages for chatId:", chatId);
+    const query = `
+      SELECT *
+      FROM messages
+      WHERE chatId = ?
+      ORDER BY timestamp ASC
+    `;
+   
+    return await dbAsync.all(query, [chatId]);
+
+  } catch (err) {
+    console.error('❌ Error getting messages:', err.message);
+    throw err;
+  }
+}
+
+/**
+ * INSERT A MESSAGE INTO A CHAT
+ */
+async function insertMessage(message) {
+  try {
+    console.log("Inserting message:", message);
+    const query = `
+      INSERT INTO messages (
+        id,
+        chatId,
+        senderId,
+        text,
+        timestamp
+      ) VALUES (?, ?, ?, ?, ?)
+    `;
+
+    await dbAsync.run(query, [
+      message.id,
+      message.chatId,
+      message.senderId,
+      message.text,
+      message.timestamp
+    ]);
+
+    return true;
+
+  } catch (err) {
+    console.error('❌ Error inserting message:', err.message);
+    throw err;
+  }
+}
+
 module.exports = {
   createUser,
   findUserByEmail,
@@ -372,7 +425,9 @@ module.exports = {
   sendFriendRequest,
   getAllFriends,
   acceptFriendRequest,
-  deleteFriendRequest
+  deleteFriendRequest,
+  getMessages,
+  insertMessage
 };
 
 //COMANDO PER INSERIRE USER A MANO DA TERMINALE (CAMBIARE STRINGHE A PIACERE):
