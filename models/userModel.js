@@ -36,12 +36,12 @@ async function createUser(
       ]
     );
 
-    console.log(`✅ User created: ${email} (ID: ${result.id})`);
+    console.log(` User created: ${email} (ID: ${result.id})`);
     return result.id;
 
   } catch (err) {
     console.log(`ciaoooo`);
-    console.error('❌ Error creating user:', err.message);
+    console.error('Error creating user:', err.message);
     throw err;
   }
 }
@@ -63,7 +63,7 @@ async function findUserByEmail(email) {
     return user;
 
   } catch (err) {
-    console.error('❌ Error finding user by email:', err.message);
+    console.error('Error finding user by email:', err.message);
     throw err;
   }
 }
@@ -85,7 +85,7 @@ async function findUserById(id) {
     return user;
 
   } catch (err) {
-    console.error('❌ Error finding user by ID:', err.message);
+    console.error('Error finding user by ID:', err.message);
     throw err;
   }
 }
@@ -110,14 +110,14 @@ async function updateUser(idUser, keyField, valueField) {
 ];
 
     if (!allowed.includes(keyField)) {
-      console.log(`❌ Field not allowed: ${keyField}`);
+      console.log(`Field not allowed: ${keyField}`);
       return false;
     }
 
     // Verifica che l'utente esista
     const user = await findUserById(idUser);
     if (!user) {
-      console.log(`❌ User not found: ${idUser}`);
+      console.log(`User not found: ${idUser}`);
       return false;
     }
 
@@ -132,14 +132,14 @@ async function updateUser(idUser, keyField, valueField) {
     // Esegui l'update
     await dbAsync.run(
       `UPDATE users SET ${keyField} = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-      [value, idUser]  // ✅ CORRETTO: idUser al posto di id
+      [value, idUser]  //  CORRETTO: idUser al posto di id
     );
 
-    console.log(`✅ User field updated: ${keyField}`);
+    console.log(` User field updated: ${keyField}`);
     return true;
 
   } catch (err) {
-    console.error(`❌ Error updating user field: ${err.message}`);
+    console.error(`Error updating user field: ${err.message}`);
     return false;
   }
 }
@@ -151,16 +151,16 @@ async function deleteUser(id) {
   try {
     const user = await findUserById(id);
     if (!user) {
-      console.log(`❌ User not found: ${id}`);
+      console.log(`User not found: ${id}`);
       return false;
     }
     else {
       await dbAsync.run(`DELETE FROM users WHERE id = ?`, [id]);
-      console.log(`✅ User deleted: ${id}`);
+      console.log(` User deleted: ${id}`);
       return true;
     }
   } catch (err) {
-    console.error('❌ Error deleting user:', err.message);
+    console.error('Error deleting user:', err.message);
     throw err;
   }
 
@@ -174,7 +174,7 @@ async function getAllUsersInfos() {
     const query = 'SELECT id, instrument, experienceLevel, genre, isInBand FROM users';
     return await dbAsync.all(query);
   } catch (err) { 
-    console.error('❌ Error finding some users:', err.message);
+    console.error('Error finding some users:', err.message);
     throw err;
   }
 }
@@ -187,7 +187,7 @@ async function getGenresStats() {
     const query = 'SELECT genre, COUNT(*) AS total FROM users GROUP BY genre ORDER BY total DESC';
     return await dbAsync.all(query);
   } catch (err) { 
-    console.error('❌ Error in counting genres:', err.message);
+    console.error('Error in counting genres:', err.message);
     throw err;
   }
 }
@@ -200,7 +200,7 @@ async function getInstrumentsStats() {
     const query = 'SELECT instrument, COUNT(*) AS total FROM users GROUP BY instrument ORDER BY total DESC';
     return await dbAsync.all(query);
   } catch (err) { 
-    console.error('❌ Error in counting instruments:', err.message);
+    console.error('Error in counting instruments:', err.message);
     throw err;
   }
 }
@@ -213,7 +213,7 @@ async function getTotNumUsers() {
     const query = 'SELECT COUNT(*) as tot_users FROM users';
     return await dbAsync.all(query);
   } catch (err) { 
-    console.error('❌ Error in counting instruments:', err.message);
+    console.error('Error in counting instruments:', err.message);
     throw err;
   }
 }
@@ -226,20 +226,20 @@ async function postUserLocation(idUser, latitude, longitude) {
     // Verifica che l'utente esista
     const user = await findUserById(idUser);
     if (!user) {
-      console.log(`❌ User not found: ${idUser}`);
+      console.log(`User not found: ${idUser}`);
       return false;
     }
 
     // Esegui l'update
     await dbAsync.run(
       `UPDATE users SET latitude = ?, longitude = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-      [latitude, longitude, idUser]  // ✅ CORRETTO: idUser al posto di id
+      [latitude, longitude, idUser]  //  CORRETTO: idUser al posto di id
     );
     
     return true;
 
   } catch (err) {
-    console.error(`❌ Error updating user location: ${err.message}`);
+    console.error(`Error updating user location: ${err.message}`);
     return false;
   }
 }
@@ -265,7 +265,7 @@ async function getNearbyMusicians(userId, userLat, userLong, range) {
     const query = 'SELECT id, name, surname, instrument, experienceLevel, genre, isInBand, photo_url, latitude, longitude FROM users WHERE ABS(? - latitude) < ? AND ABS(? - longitude) < ? AND id != ?';
     return await dbAsync.all(query, [userLat, latDelta, userLong, longDelta, userId]);
   } catch (err) { 
-    console.error('❌ Error in fetching nearby musicians:', err.message);
+    console.error('Error in fetching nearby musicians:', err.message);
     throw err;
   }
 }
@@ -280,11 +280,11 @@ async function sendFriendRequest(senderId, receiverId) {
       [senderId, receiverId, "PENDING"]
     );
 
-    console.log(`✅ Friend request sent to user ${receiverId}`);
+    console.log(` Friend request sent to user ${receiverId}`);
     return true;
 
   } catch (err) {
-    console.error('❌ Error sending friend request:', err.message);
+    console.error('Error sending friend request:', err.message);
     return false;
   }
 }
@@ -297,7 +297,7 @@ async function getAllFriends(userId) {
     const query = 'SELECT users.id, users.name, users.surname, users.phone, users.bio, users.instrument, users.experienceLevel, users.genre, users.id, users.isInBand, users.photo_url, friendships.sender_id, friendships.receiver_id, friendships.status FROM users JOIN friendships ON users.id = friendships.sender_id OR users.id = friendships.receiver_id WHERE users.id != ?';
     return await dbAsync.all(query, [userId]);
   } catch (err) { 
-    console.error('❌ Error finding friends:', err.message);
+    console.error('Error finding friends:', err.message);
     throw err;
   }
 }
@@ -313,11 +313,11 @@ async function acceptFriendRequest(senderId, receiverId) {
       [senderId, receiverId]
     );
 
-    console.log(`✅ Friend request accepted between users ${receiverId} and ${senderId}`);
+    console.log(` Friend request accepted between users ${receiverId} and ${senderId}`);
     return true;
 
   } catch (err) {
-    console.error('❌ Error sending friend request:', err.message);
+    console.error('Error sending friend request:', err.message);
     return false;
   }
 }
@@ -330,11 +330,11 @@ async function acceptFriendRequest(senderId, receiverId) {
   try {
     await dbAsync.run(`DELETE FROM friendships WHERE sender_id = ? AND receiver_id = ?`, [senderId, receiverId]);
 
-    console.log(`✅ Friend request rejected between users ${receiverId} and ${senderId}`);
+    console.log(` Friend request rejected between users ${receiverId} and ${senderId}`);
     return true;
 
   } catch (err) {
-    console.error('❌ Error rejecting friend request:', err.message);
+    console.error('Error rejecting friend request:', err.message);
     return false;
   }
 }*/
@@ -347,11 +347,11 @@ async function deleteFriendRequest(senderId, receiverId) {
   try {
     await dbAsync.run(`DELETE FROM friendships WHERE sender_id = ? AND receiver_id = ?`, [senderId, receiverId]);
 
-    console.log(`✅ Friend request rejected between users ${receiverId} and ${senderId}`);
+    console.log(` Friend request rejected between users ${receiverId} and ${senderId}`);
     return true;
 
   } catch (err) {
-    console.error('❌ Error rejecting friend request:', err.message);
+    console.error('Error rejecting friend request:', err.message);
     return false;
   }
 }
@@ -372,7 +372,7 @@ async function getMessages(chatId) {
     return await dbAsync.all(query, [chatId]);
 
   } catch (err) {
-    console.error('❌ Error getting messages:', err.message);
+    console.error('Error getting messages:', err.message);
     throw err;
   }
 }
@@ -404,7 +404,7 @@ async function insertMessage(message) {
     return true;
 
   } catch (err) {
-    console.error('❌ Error inserting message:', err.message);
+    console.error('Error inserting message:', err.message);
     throw err;
   }
 }

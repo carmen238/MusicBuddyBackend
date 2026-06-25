@@ -5,9 +5,9 @@ const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'musicbuddy.db'
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('❌ Error opening database:', err);
+    console.error(' Error opening database:', err);
   } else {
-    console.log('✅ Connected to SQLite database');
+    console.log('Connected to SQLite database');
     initializeDatabase();
   }
 });
@@ -16,7 +16,7 @@ const initializeDatabase = () => {
   // Attivazione delle foreign keys per questa connessione
   db.run('PRAGMA foreign_keys = ON;', (err) => {
     if (err) console.error("Error while activating FK:", err.message);
-    else console.log("✅ Foreign keys activated successfully.");
+    else console.log("Foreign keys activated successfully.");
   });
 
   db.run(`
@@ -40,9 +40,9 @@ const initializeDatabase = () => {
     );
   `, (err) => {
     if (err) {
-      console.error('❌ Error creating users table:', err);
+      console.error(' Error creating users table:', err);
     } else {
-      console.log('✅ Users table created');
+      console.log('Users table created');
     }
   });
 
@@ -62,9 +62,9 @@ const initializeDatabase = () => {
     );
   `, (err) => {
     if (err) {
-      console.error('❌ Error creating users table:', err);
+      console.error(' Error creating users table:', err);
     } else {
-      console.log('✅ Users table created');
+      console.log('Users table created');
     }   //status deve essere 'PENDING','ACCEPTED' o 'REJECTED' (quest'ultimo opzionale, puoi semplicemente eliminare la riga)
   });
 
@@ -80,9 +80,9 @@ const initializeDatabase = () => {
   );
 `, (err) => {
     if (err) {
-      console.error('❌ Error creating messages table:', err);
+      console.error(' Error creating messages table:', err);
     } else {
-      console.log('✅ Messages table created');
+      console.log('Messages table created');
     }
   });
 };
